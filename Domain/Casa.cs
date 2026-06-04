@@ -17,4 +17,8 @@ public class Casa
         this.Fundador = Fundador;
         this.Fantasma = Fantasma;
     }
+    public bool TieneEsteId(int idABuscar)
+    {
+        return this.Idcasa == idABuscar;
+    }
 }
