@@ -1,7 +1,7 @@
 ﻿namespace Service;
 using Domain;
 using Repositroy;
-
+using Service.DTOs;
 public class PersonajeService
 {
     private readonly PersonajeRepository _personajeRepository;
@@ -9,8 +9,9 @@ public class PersonajeService
     
     public PersonajeService()
     {
-        _personajeRepository = new PersonajeRepository();
         _casaRepository = new CasaRepository();
+        _personajeRepository = new PersonajeRepository();
+        
     }
     
     public void CrearMago(string nombre, string apellido, DateTime fechaNacimiento, string genero, string tipoSangre, int idCasa)
@@ -57,5 +58,36 @@ public class PersonajeService
         }
         
     }
-    
+    public IEnumerable<PersonajeDto> ObtenerTodosLosPersonajes()
+    {
+        IEnumerable<Personaje> personajesDominio = _personajeRepository.ObtenerTodos();
+        var listaDtos = new List<PersonajeDto>();
+
+        foreach (var p in personajesDominio)
+        {
+            var dto = new PersonajeDto
+            {
+                Nombre = p.Nombre,
+                Apellido = p.Apellido
+            };
+
+            // Mapeo síncrono dependiendo del tipo de herencia del Dominio
+            if (p is Mago mago)
+            {
+                dto.Tipo = "Mago";
+            }
+            else if (p is Muggle muggle)
+            {
+                dto.Tipo = "Muggle";
+            }
+            else if (p is Duende duende)
+            {
+                dto.Tipo = "Duende";
+            }
+
+            listaDtos.Add(dto);
+        }
+
+        return listaDtos;
+    }
 }

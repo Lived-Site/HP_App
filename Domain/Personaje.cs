@@ -1,12 +1,12 @@
 ﻿
 namespace Domain;
 
-public class Personaje
+public abstract class Personaje
 {
     private static int ultimoId = 0;
     public int IdPersonaje { get; private set; }
-    private string Nombre { get; set; }
-    private string Apellido { get; set; }
+    public string Nombre { get; set; }
+    public string Apellido { get; set; }
     private DateTime fecha_nacimiento { get; set; }
     private string Genero { get; set; }
     private string TipoRaza { get; set; }

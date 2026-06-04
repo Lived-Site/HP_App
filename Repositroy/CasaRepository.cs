@@ -4,7 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 public class CasaRepository : RepositoryBase<Casa>
 {
-    
+    public CasaRepository()
+    {
+        // Solo cargamos si no hay casas ya guardadas en el repositorio base
+        if (!ObtenerTodos().Any())
+        {
+            CargarCasasPorDefecto();
+        }
+    }
     private void CargarCasasPorDefecto()
     {
         Casa gryffindor = new Casa("Gryffindor", "Godric Gryffindor", "Nick Casi Decapitado");

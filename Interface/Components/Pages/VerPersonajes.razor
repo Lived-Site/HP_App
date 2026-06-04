@@ -1,0 +1,53 @@
+﻿@page "/VerPersonajes"
+@using Service
+@using Service.DTOs
+@inject PersonajeService PersonajeService
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<h3>Lista de Personajes</h3>
+
+<button @onclick="IrACrear">Crear Nuevo Personaje</button>
+
+@if (personajes == null)
+{
+    <p><em>Cargando el Gran Comedor...</em></p>
+}
+else if (!personajes.Any())
+{
+    <p>No hay personajes registrados en el mundo mágico todavía.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var personaje in personajes)
+        {
+            <tr>
+                <td>@personaje.Nombre</td>
+                <td>@personaje.Apellido</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<PersonajeDto> personajes;
+
+    protected override void OnInitialized()
+    {
+        personajes = PersonajeService.ObtenerTodosLosPersonajes();
+    }
+
+    private void IrACrear()
+    {
+        NavManager.NavigateTo("/crearPersonaje");
+    }
+}

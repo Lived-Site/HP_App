@@ -1,0 +1,183 @@
+﻿@page "/crearPersonaje"
+@using Service
+@rendermode InteractiveServer
+@inject NavigationManager NavManager
+@inject PersonajeService PersonajeService
+
+<h3>Crear Personaje</h3>
+
+<EditForm Model="modelo" OnSubmit="ManejarEnvio">
+
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="modelo.Nombre" />
+    </div>
+
+    <div>
+        <label>Apellido:</label>
+        <InputText @bind-Value="modelo.Apellido" />
+    </div>
+
+    <div>
+        <label>Fecha de nacimiento:</label>
+        <InputDate @bind-Value="modelo.FechaNacimiento" />
+    </div>
+
+    <div>
+        <label>Género:</label>
+        <InputText @bind-Value="modelo.Genero" />
+    </div>
+
+    <div>
+        <label>Tipo de raza:</label>
+        <InputSelect @bind-Value="modelo.TipoRaza">
+            <option value="">Seleccione una raza</option>
+            <option value="Mago">Mago</option>
+            <option value="Muggle">Muggle</option>
+            <option value="Duende">Duende</option>
+        </InputSelect>
+    </div>
+
+    @if (modelo.TipoRaza == "Mago")
+    {
+        <div>
+            <label>Casa:</label>
+            <InputSelect @bind-Value="modelo.Casa">
+                <option value="0">Seleccione una casa</option>
+                <option value="1">Gryffindor</option>
+                <option value="2">Slytherin</option>
+                <option value="3">Hufflepuff</option>
+                <option value="4">Ravenclaw</option>
+            </InputSelect>
+        </div>
+
+        <div>
+            <label>Tipo de Sangre:</label>
+            <InputSelect @bind-Value="modelo.Sangre">
+                <option value="">Seleccione un Tipo de sangre</option>
+                <option value="Pura">Pura</option>
+                <option value="Mestiza">Mestiza</option>
+                <option value="Hijo de Muggles">Hijo de Muggles</option>
+            </InputSelect>
+        </div>
+    }
+
+    @if (modelo.TipoRaza == "Muggle")
+    {
+        <div>
+            <label>Profesión:</label>
+            <InputText @bind-Value="modelo.Profesion" />
+        </div>
+        
+        <div>
+            <label>Sabe de magia:</label>
+            <InputSelect @bind-Value="modelo.SabeDeMagiaString">
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </InputSelect>
+        </div>
+    }
+
+    @if (modelo.TipoRaza == "Duende")
+    {
+        <div>
+            <label>¿Trabajas en el banco?:</label>
+            <InputSelect @bind-Value="modelo.TrabajasBancoString">
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </InputSelect>
+        </div>
+
+        <div>
+            <label>¿Sabes usar la forja?</label>
+            <InputSelect @bind-Value="modelo.ForjaString">
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </InputSelect>
+        </div>
+    }
+
+    <button type="submit">Crear</button>
+
+</EditForm>
+
+@code {
+    private FormularioPersonaje modelo = new();
+
+    private void ManejarEnvio()
+    {
+        if (string.IsNullOrEmpty(modelo.TipoRaza)) return;
+
+        try
+        {
+            switch (modelo.TipoRaza)
+            {
+                case "Mago":
+                    PersonajeService.CrearMago(
+                        modelo.Nombre,
+                        modelo.Apellido,
+                        modelo.FechaNacimiento,
+                        modelo.Genero,
+                        modelo.Sangre,
+                        modelo.Casa
+                    );
+                    break;
+
+                case "Muggle":
+                    bool sabeMagia = bool.Parse(modelo.SabeDeMagiaString);
+                    
+                    PersonajeService.CrearMuggle(
+                        modelo.Nombre,
+                        modelo.Apellido,
+                        modelo.FechaNacimiento,
+                        modelo.Genero,
+                        modelo.Profesion,
+                        sabeMagia
+                    );
+                    break;
+
+                case "Duende":
+                    bool trabajaBanco = bool.Parse(modelo.TrabajasBancoString);
+                    bool sabeForja = bool.Parse(modelo.ForjaString);
+
+                    PersonajeService.CrearDuende(
+                        modelo.Nombre,
+                        modelo.Apellido,
+                        modelo.FechaNacimiento,
+                        modelo.Genero,
+                        trabajaBanco,
+                        sabeForja
+                    );
+                    break;
+            }
+            Console.WriteLine($"Personaje creado con exito");
+            NavManager.NavigateTo("/inicio");
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Error de validación: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error inesperado: {ex.Message}");
+        }
+    }
+
+    public class FormularioPersonaje
+    {
+        public string Nombre { get; set; } = "";
+        public string Apellido { get; set; } = ""; 
+        public DateTime FechaNacimiento { get; set; } = DateTime.Today;
+        public string Genero { get; set; } = "";
+        public string TipoRaza { get; set; } = "";
+        
+        public int Casa { get; set; } = 0;
+        public string Sangre { get; set; } = "";
+        
+        public string Profesion { get; set; } = "";
+        public string SabeDeMagiaString { get; set; } = "false";
+
+        public string TrabajasBancoString { get; set; } = "false";
+        public string ForjaString { get; set; } = "false";
+    }
+}

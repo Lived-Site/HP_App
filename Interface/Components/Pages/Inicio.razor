@@ -1,0 +1,22 @@
+﻿@page "/inicio"
+@using Service
+@rendermode InteractiveServer
+@inject NavigationManager NavManager
+
+<h3>Inicio</h3>
+<p>¿Que quieres hacer?</p>
+
+<button class="btn btn-primary" @onclick="CrearPersonaje">Crear Personaje</button>
+<button class="btn btn-primary" @onclick="VerPersonajes">Ver Personajes</button>
+
+@code {
+    private void CrearPersonaje()
+    {
+        NavManager.NavigateTo("/crearPersonaje");
+    }
+
+    private void VerPersonajes()
+    {
+        NavManager.NavigateTo("/VerPersonajes");
+    }
+}
