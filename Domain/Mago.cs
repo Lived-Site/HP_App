@@ -12,7 +12,7 @@ public class Mago : Personaje
     {
     }
 
-    public Mago(string nombre,string apellido, DateTime fechaNacimiento, string genero, string tipoRaza, string tipoSangre, int idCasa) : base(nombre,apellido, fechaNacimiento, genero, tipoRaza)
+    public Mago(string nombre,string apellido, DateTime fechaNacimiento, string genero, string tipoRaza, string foto, string tipoSangre, int idCasa) : base(nombre,apellido, fechaNacimiento, genero, tipoRaza, foto)
     {
         TipoSangre = tipoSangre;
         IdCasa = idCasa;

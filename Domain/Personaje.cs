@@ -10,8 +10,9 @@ public abstract class Personaje
     private DateTime fecha_nacimiento { get; set; }
     private string Genero { get; set; }
     private string TipoRaza { get; set; }
+    public string Foto { get; private set; }
 
-    public Personaje(string Nombre, string Apellido, DateTime fecha_nacimiento, string Genero, string tipo_raza)
+    public Personaje(string Nombre, string Apellido, DateTime fecha_nacimiento, string Genero, string tipo_raza, string foto)
     {
         if (string.IsNullOrWhiteSpace(Nombre)) 
             throw new ArgumentException("Un personaje no puede nacer sin nombre.");
@@ -26,11 +27,22 @@ public abstract class Personaje
         this.fecha_nacimiento = fecha_nacimiento;
         this.Genero = Genero;
         this.TipoRaza = tipo_raza;
+        this.Foto = string.IsNullOrWhiteSpace(foto) ? "silueta.png" : foto;
     }
 
     public Personaje()
     {
         IdPersonaje = ++ultimoId;
+        this.Foto = "silueta.png";
+    }
+    
+    public void ModificarFoto(string nuevaFoto)
+    {
+        if (string.IsNullOrWhiteSpace(nuevaFoto))
+        {
+            throw new ArgumentException("El nombre del archivo de la foto no puede estar vacío.");
+        }
+        Foto = nuevaFoto;
     }
     
     public void CambiarNombre(string nuevoNombre)

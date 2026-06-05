@@ -14,7 +14,7 @@ public class PersonajeService
         
     }
     
-    public void CrearMago(string nombre, string apellido, DateTime fechaNacimiento, string genero, string tipoSangre, int idCasa)
+    public void CrearMago(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, string tipoSangre, int idCasa)
     {
         ValidarDatosBasicos(nombre, apellido, fechaNacimiento);
         if (string.IsNullOrWhiteSpace(tipoSangre))
@@ -25,23 +25,23 @@ public class PersonajeService
         {
             throw new InvalidOperationException($"No se puede crear el mago. La casa con ID {idCasa} no existe.");
         }
-        Mago nuevoMago = new Mago(nombre, apellido, fechaNacimiento, genero, "Mago", tipoSangre, idCasa);
+        Mago nuevoMago = new Mago(nombre, apellido, fechaNacimiento, genero, "Mago", foto, tipoSangre, idCasa);
         _personajeRepository.Agregar(nuevoMago);
     }
     
     
-    public void CrearMuggle(string nombre, string apellido, DateTime fechaNacimiento, string genero, string Profesion, bool SabeDeMagia)
+    public void CrearMuggle(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, string Profesion, bool SabeDeMagia)
     {
         ValidarDatosBasicos(nombre, apellido, fechaNacimiento);
         
-        Muggle nuevoMuggle = new Muggle(nombre, apellido, fechaNacimiento, genero, "Muggle", Profesion, SabeDeMagia);
+        Muggle nuevoMuggle = new Muggle(nombre, apellido, fechaNacimiento, genero, "Muggle", foto, Profesion, SabeDeMagia);
         _personajeRepository.Agregar(nuevoMuggle);
     }
-    public void CrearDuende(string nombre, string apellido, DateTime fechaNacimiento, string genero, bool trabaja, bool forja)
+    public void CrearDuende(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, bool trabaja, bool forja)
     {
         ValidarDatosBasicos(nombre, apellido, fechaNacimiento);
         
-        Duende nuevoDuende = new Duende(nombre, apellido, fechaNacimiento, genero, "Duende", trabaja, forja);
+        Duende nuevoDuende = new Duende(nombre, apellido, fechaNacimiento, genero, "Duende", foto, trabaja, forja);
         _personajeRepository.Agregar(nuevoDuende);
     }
     
@@ -68,7 +68,8 @@ public class PersonajeService
             var dto = new PersonajeDto
             {
                 Nombre = p.Nombre,
-                Apellido = p.Apellido
+                Apellido = p.Apellido,
+                FotoUrl = $"images/{p.Foto}"
             };
 
             // Mapeo síncrono dependiendo del tipo de herencia del Dominio
