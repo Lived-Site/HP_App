@@ -37,24 +37,24 @@ public class PersonajeRepository : RepositoryBase<Personaje>
         Mago dean = new Mago("Dean", "Thomas", new DateTime(1980, 9, 7), "Hombre", "Mago", "dean.jfif", "Mestiza", 1);
         
         // Slytherin (ID: 2)
-        Mago snape = new Mago("Severus", "Snape", new DateTime(1960, 1, 9), "Hombre", "Mago", "silueta.png", "Mestiza", 2); 
-        Mago draco = new Mago("Draco", "Malfoy", new DateTime(1980, 6, 5), "Hombre", "Mago", "silueta.png", "Pura", 2);
-        Mago bellatrix = new Mago("Bellatrix", "Lestrange", new DateTime(1951, 12, 30), "Mujer", "Mago", "silueta.png", "Pura", 2);
-        Mago lucius = new Mago("Lucius", "Malfoy", new DateTime(1954, 9, 22), "Hombre", "Mago", "silueta.png", "Pura", 2);
-        Mago narcissa = new Mago("Narcissa", "Malfoy", new DateTime(1955, 9, 1), "Mujer", "Mago", "silueta.png", "Pura", 2);
-        Mago regulus = new Mago("Regulus", "Black", new DateTime(1961, 9, 1), "Hombre", "Mago", "silueta.png", "Pura", 2);
-        Mago pansy = new Mago("Pansy", "Parkinson", new DateTime(1979, 9, 1), "Mujer", "Mago", "silueta.png", "Pura", 2);
+        Mago snape = new Mago("Severus", "Snape", new DateTime(1960, 1, 9), "Hombre", "Mago", "snape.jpg", "Mestiza", 2); 
+        Mago draco = new Mago("Draco", "Malfoy", new DateTime(1980, 6, 5), "Hombre", "Mago", "draco.png", "Pura", 2);
+        Mago bellatrix = new Mago("Bellatrix", "Lestrange", new DateTime(1951, 12, 30), "Mujer", "Mago", "bela.png", "Pura", 2);
+        Mago lucius = new Mago("Lucius", "Malfoy", new DateTime(1954, 9, 22), "Hombre", "Mago", "lucius.png", "Pura", 2);
+        Mago narcissa = new Mago("Narcissa", "Malfoy", new DateTime(1955, 9, 1), "Mujer", "Mago", "narcissa.jfif", "Pura", 2);
+        Mago regulus = new Mago("Regulus", "Black", new DateTime(1961, 9, 1), "Hombre", "Mago", "Regulus.webp", "Pura", 2);
+        Mago pansy = new Mago("Pansy", "Parkinson", new DateTime(1979, 9, 1), "Mujer", "Mago", "pansy.webp", "Pura", 2);
         
         // Hufflepuff (ID: 3)
-        Mago cedric = new Mago("Cedric", "Diggory", new DateTime(1977, 9, 1), "Hombre", "Mago", "silueta.png", "Pura", 3);
-        Mago tonks = new Mago("Nymphadora", "Tonks", new DateTime(1973, 9, 1), "Mujer", "Mago", "silueta.png", "Mestiza", 3);
-        Mago newt = new Mago("Newt", "Scamander", new DateTime(1897, 2, 24), "Hombre", "Mago", "silueta.png", "Pura", 3);
+        Mago cedric = new Mago("Cedric", "Diggory", new DateTime(1977, 9, 1), "Hombre", "Mago", "cedric.png", "Pura", 3);
+        Mago tonks = new Mago("Nymphadora", "Tonks", new DateTime(1973, 9, 1), "Mujer", "Mago", "tonks.webp", "Mestiza", 3);
+        Mago newt = new Mago("Newt", "Scamander", new DateTime(1897, 2, 24), "Hombre", "Mago", "newt.png", "Pura", 3);
         
         // Ravenclaw (ID: 4)
-        Mago luna = new Mago("Luna", "Lovegood", new DateTime(1981, 2, 13), "Mujer", "Mago", "silueta.png", "Pura", 4);
-        Mago cho = new Mago("Cho", "Chang", new DateTime(1979, 9, 1), "Mujer", "Mago", "Pura", "silueta.png", 4); 
-        Mago Lockhart = new Mago("Gilderoy", "Lockhart", new DateTime(1964, 1, 26), "Hombre", "Mago", "silueta.png", "Mestiza", 4);
-        Mago ollivander = new Mago("Garrick", "Ollivander", new DateTime(1919, 9, 25), "Hombre", "Mago", "silueta.png", "Mestiza", 4);
+        Mago luna = new Mago("Luna", "Lovegood", new DateTime(1981, 2, 13), "Mujer", "Mago", "luna.png", "Pura", 4);
+        Mago cho = new Mago("Cho", "Chang", new DateTime(1979, 9, 1), "Mujer", "Mago", "Pura", "cho.png", 4); 
+        Mago Lockhart = new Mago("Gilderoy", "Lockhart", new DateTime(1964, 1, 26), "Hombre", "Mago", "lock.webp", "Mestiza", 4);
+        Mago ollivander = new Mago("Garrick", "Ollivander", new DateTime(1919, 9, 25), "Hombre", "Mago", "garrick.webp", "Mestiza", 4);
         
         Agregar(harry);
         Agregar(hermione);
