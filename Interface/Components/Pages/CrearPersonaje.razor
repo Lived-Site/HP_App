@@ -1,131 +1,187 @@
 ﻿@page "/crearPersonaje"
 @using Service
+@using System.ComponentModel.DataAnnotations
 @rendermode InteractiveServer
 @inject NavigationManager NavManager
 @inject PersonajeService PersonajeService
 
-<h3>Crear Personaje</h3>
+<PageTitle>Hogwarts - Registro Oficial</PageTitle>
 
-<EditForm Model="modelo" OnSubmit="ManejarEnvio">
-
-    <div style="margin-bottom: 20px; text-align: center;">
-        <label style="display: block; margin-bottom: 5px;"><strong>Vista Previa:</strong></label>
-        <img src="@(modelo.Foto.StartsWith("data:image") ? modelo.Foto : $"/images/{modelo.Foto}")" 
-             alt="Previsualización" 
-             style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; background-color: white;" />
-    </div>
-
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="modelo.Nombre" />
-    </div>
-
-    <div>
-        <label>Apellido:</label>
-        <InputText @bind-Value="modelo.Apellido" />
-    </div>
-
-    <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Foto de perfil:</label>
-    
-        <div style="border: 2px dashed #999; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9; position: relative; cursor: pointer;">
-            <InputFile OnChange="ManejarSeleccionDeArchivo" accept=".png,.jpg,.jpeg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+<div class="hogwarts-form-container">
+    <div class="parchment-form-card">
         
-            <p style="margin: 0; color: #555;">
-                📷 Haz clic para buscar en tu carpeta o <strong>arrastra la foto aquí</strong>
-            </p>
+        <div class="form-magic-header">
+            <h2 class="form-wizard-title">Registro de Habitantes</h2>
+            <p class="form-wizard-subtitle">Inscriba al nuevo individuo en el libro oficial de la magia</p>
         </div>
+
+        <hr class="magic-divider" />
+
+        <EditForm Model="modelo" OnValidSubmit="ManejarEnvio">
+            <DataAnnotationsValidator />
+            
+            @if (mostrarError)
+            {
+                <div class="magic-alert-error">
+                    🔮 <strong>Error del Ministerio:</strong> Por favor, complete todos los campos obligatorios requeridos para esta raza.
+                </div>
+            }
+
+            <div class="preview-section">
+                <div class="avatar-frame">
+                    <img src="@(!string.IsNullOrEmpty(modelo.Foto) && modelo.Foto.StartsWith("data:image") ? modelo.Foto : $"/images/{(string.IsNullOrEmpty(modelo.Foto) ? "silueta.png" : modelo.Foto)}")" 
+                         alt="Previsualización" 
+                         class="avatar-preview" />
+                </div>
+                
+                <div class="file-drop-zone">
+                    <InputFile OnChange="ManejarSeleccionDeArchivo" accept=".png,.jpg,.jpeg" class="file-input-hidden" />
+                    <p class="file-drop-text">
+                        📷 Haz clic o <strong>arrastra una foto aquí</strong> para el retrato oficial.
+                    </p>
+                </div>
+            </div>
+
+            <div class="magic-grid">
+                <div class="form-group">
+                    <label class="magic-label">Nombre:</label>
+                    <InputText @bind-Value="modelo.Nombre" class="magic-input" placeholder="Ej: Harry" />
+                    <ValidationMessage For="@(() => modelo.Nombre)" class="text-danger-magic" />
+                </div>
+
+                <div class="form-group">
+                    <label class="magic-label">Apellido:</label>
+                    <InputText @bind-Value="modelo.Apellido" class="magic-input" placeholder="Ej: Potter" />
+                    <ValidationMessage For="@(() => modelo.Apellido)" class="text-danger-magic" />
+                </div>
+
+                <div class="form-group">
+                    <label class="magic-label">Fecha de nacimiento:</label>
+                    <InputDate @bind-Value="modelo.FechaNacimiento" class="magic-input" />
+                    <ValidationMessage For="@(() => modelo.FechaNacimiento)" class="text-danger-magic" />
+                </div>
+
+                <div class="form-group">
+                    <label class="magic-label">Género:</label>
+                    <InputText @bind-Value="modelo.Genero" class="magic-input" placeholder="Ej: Masculino, Femenino..." />
+                    <ValidationMessage For="@(() => modelo.Genero)" class="text-danger-magic" />
+                </div>
+            </div>
+
+            <div class="form-group select-raza-container">
+                <label class="magic-label highlight">Naturaleza / Tipo de Raza:</label>
+                <InputSelect @bind-Value="modelo.TipoRaza" class="magic-input magic-select">
+                    <option value="">-- Seleccione una raza --</option>
+                    <option value="Mago">Mago / Bruja 🪄</option>
+                    <option value="Muggle">Muggle 👤</option>
+                    <option value="Duende">Duende 🪙</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => modelo.TipoRaza)" class="text-danger-magic" />
+            </div>
+
+            @if (modelo.TipoRaza == "Mago")
+            {
+                <div class="dynamic-section-magic animated-fade-in">
+                    <h4 class="dynamic-title">Datos del Colegio y Linaje</h4>
+                    <div class="magic-grid">
+                        <div class="form-group">
+                            <label class="magic-label">Casa de Hogwarts:</label>
+                            <InputSelect @bind-Value="modelo.Casa" class="magic-input magic-select">
+                                <option value="0">Seleccione una casa</option>
+                                <option value="1">Gryffindor🦁</option>
+                                <option value="2">Slytherin🐍</option>
+                                <option value="3">Hufflepuff🦡</option>
+                                <option value="4">Ravenclaw🦅</option>
+                            </InputSelect>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="magic-label">Estatus de Sangre:</label>
+                            <InputSelect @bind-Value="modelo.Sangre" class="magic-input magic-select">
+                                <option value="">Seleccione tipo de sangre</option>
+                                <option value="Pura">Sangre Pura</option>
+                                <option value="Mestiza">Sangre Mestiza</option>
+                                <option value="Hijo de Muggles">Hijo de Muggles</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (modelo.TipoRaza == "Muggle")
+            {
+                <div class="dynamic-section-magic animated-fade-in">
+                    <h4 class="dynamic-title">Registro No Mágico (Muggle)</h4>
+                    <div class="magic-grid">
+                        <div class="form-group">
+                            <label class="magic-label">Profesión del Mundo No Mágico:</label>
+                            <InputText @bind-Value="modelo.Profesion" class="magic-input" placeholder="Ej: Dentista" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="magic-label">¿Tiene conocimiento de la magia?:</label>
+                            <InputSelect @bind-Value="modelo.SabeDeMagiaString" class="magic-input magic-select">
+                                <option value="true">Sí, está al tanto</option>
+                                <option value="false">No, vive en la ignorancia</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (modelo.TipoRaza == "Duende")
+            {
+                <div class="dynamic-section-magic animated-fade-in">
+                    <h4 class="dynamic-title">Atributos del Duende de Gringotts</h4>
+                    <div class="magic-grid">
+                        <div class="form-group">
+                            <label class="magic-label">¿Trabaja en el Banco Gringotts?:</label>
+                            <InputSelect @bind-Value="modelo.TrabajasBancoString" class="magic-input magic-select">
+                                <option value="true">Sí, custodio de cámaras</option>
+                                <option value="false">No</option>
+                            </InputSelect>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="magic-label">¿Domina el arte ancestral de la forja?:</label>
+                            <InputSelect @bind-Value="modelo.ForjaString" class="magic-input magic-select">
+                                <option value="true">Sí, forjador experto</option>
+                                <option value="false">No</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+            }
+<div class="form-actions">
+                <button type="button" class="btn-magic-cancel" @onclick="Volver">
+                    ❌ Cancelar
+                </button>
+                <button type="submit" class="btn-magic-submit">
+                    ✨ Inscribir Personaje
+                </button>
+            </div>
+
+        </EditForm>
     </div>
-
-    <div>
-        <label>Fecha de nacimiento:</label>
-        <InputDate @bind-Value="modelo.FechaNacimiento" />
-    </div>
-
-    <div>
-        <label>Género:</label>
-        <InputText @bind-Value="modelo.Genero" />
-    </div>
-
-    <div>
-        <label>Tipo de raza:</label>
-        <InputSelect @bind-Value="modelo.TipoRaza">
-            <option value="">Seleccione una raza</option>
-            <option value="Mago">Mago</option>
-            <option value="Muggle">Muggle</option>
-            <option value="Duende">Duende</option>
-        </InputSelect>
-    </div>
-
-    @if (modelo.TipoRaza == "Mago")
-    {
-        <div>
-            <label>Casa:</label>
-            <InputSelect @bind-Value="modelo.Casa">
-                <option value="0">Seleccione una casa</option>
-                <option value="1">Gryffindor</option>
-                <option value="2">Slytherin</option>
-                <option value="3">Hufflepuff</option>
-                <option value="4">Ravenclaw</option>
-            </InputSelect>
-        </div>
-
-        <div>
-            <label>Tipo de Sangre:</label>
-            <InputSelect @bind-Value="modelo.Sangre">
-                <option value="">Seleccione un Tipo de sangre</option>
-                <option value="Pura">Pura</option>
-                <option value="Mestiza">Mestiza</option>
-                <option value="Hijo de Muggles">Hijo de Muggles</option>
-            </InputSelect>
-        </div>
-    }
-
-    @if (modelo.TipoRaza == "Muggle")
-    {
-        <div>
-            <label>Profesión:</label>
-            <InputText @bind-Value="modelo.Profesion" />
-        </div>
-        
-        <div>
-            <label>Sabe de magia:</label>
-            <InputSelect @bind-Value="modelo.SabeDeMagiaString">
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </InputSelect>
-        </div>
-    }
-
-    @if (modelo.TipoRaza == "Duende")
-    {
-        <div>
-            <label>¿Trabajas en el banco?:</label>
-            <InputSelect @bind-Value="modelo.TrabajasBancoString">
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </InputSelect>
-        </div>
-
-        <div>
-            <label>¿Sabes usar la forja?</label>
-            <InputSelect @bind-Value="modelo.ForjaString">
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-            </InputSelect>
-        </div>
-    }
-
-    <button type="submit">Crear</button>
-
-</EditForm>
+</div>
 
 @code {
     private FormularioPersonaje modelo = new();
+    private bool mostrarError = false;
 
     private void ManejarEnvio()
     {
-        if (string.IsNullOrEmpty(modelo.TipoRaza)) return;
+        mostrarError = false;
+        if (modelo.TipoRaza == "Mago" && (modelo.Casa == 0 || string.IsNullOrEmpty(modelo.Sangre)))
+        {
+            mostrarError = true;
+            return;
+        }
+        if (modelo.TipoRaza == "Muggle" && string.IsNullOrEmpty(modelo.Profesion))
+        {
+            mostrarError = true;
+            return;
+        }
 
         try
         {
@@ -140,13 +196,11 @@
                         modelo.Foto,
                         modelo.Sangre,
                         modelo.Casa
-                        
                     );
                     break;
 
                 case "Muggle":
                     bool sabeMagia = bool.Parse(modelo.SabeDeMagiaString);
-                    
                     PersonajeService.CrearMuggle(
                         modelo.Nombre,
                         modelo.Apellido,
@@ -161,7 +215,6 @@
                 case "Duende":
                     bool trabajaBanco = bool.Parse(modelo.TrabajasBancoString);
                     bool sabeForja = bool.Parse(modelo.ForjaString);
-
                     PersonajeService.CrearDuende(
                         modelo.Nombre,
                         modelo.Apellido,
@@ -173,54 +226,327 @@
                     );
                     break;
             }
-            Console.WriteLine($"Personaje creado con éxito");
             NavManager.NavigateTo("/VerPersonajes");
-        }
-        catch (ArgumentException ex)
-        {
-            Console.WriteLine($"Error de validación: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error inesperado: {ex.Message}");
+            Console.WriteLine($"Error al registrar: {ex.Message}");
+            mostrarError = true;
         }
     }
 
+    private async Task ManejarSeleccionDeArchivo(InputFileChangeEventArgs e)
+    {
+        var archivoImagen = e.File;
+        if (archivoImagen != null)
+        {
+            try
+            {
+                long maximoTamañoArchivo = 1024 * 1024 * 2; // 2MB
+                using var stream = archivoImagen.OpenReadStream(maximoTamañoArchivo);
+            
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+
+                var buffer = memoryStream.ToArray();
+                string tipoContenido = archivoImagen.ContentType;
+                string base64String = Convert.ToBase64String(buffer);
+
+                modelo.Foto = $"data:{tipoContenido};base64,{base64String}";
+            }
+            catch (System.IO.IOException ex)
+            {
+                // Aquí cae si el archivo mide más de 2MB
+                Console.WriteLine($"Error de lectura (posiblemente excede los 2MB): {ex.Message}");
+                mostrarError = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al procesar la imagen: {ex.Message}");
+            }
+        }
+    }
+
+    private void Volver() => NavManager.NavigateTo("/inicio");
+
     public class FormularioPersonaje
     {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [StringLength(30, ErrorMessage = "El nombre es demasiado largo")]
         public string Nombre { get; set; } = "";
+
+        [Required(ErrorMessage = "El apellido es obligatorio")]
+        [StringLength(30, ErrorMessage = "El apellido es demasiado largo")]
         public string Apellido { get; set; } = ""; 
+
+        [Required(ErrorMessage = "La fecha de nacimiento es requerida")]
         public DateTime FechaNacimiento { get; set; } = DateTime.Today;
+
+        [Required(ErrorMessage = "Especifique el género")]
         public string Genero { get; set; } = "";
+
+        [Required(ErrorMessage = "Debe elegir una raza")]
         public string TipoRaza { get; set; } = "";
         
         public string Foto { get; set; } = "silueta.png"; 
         
         public int Casa { get; set; } = 0;
         public string Sangre { get; set; } = "";
-        
         public string Profesion { get; set; } = "";
         public string SabeDeMagiaString { get; set; } = "false";
-
         public string TrabajasBancoString { get; set; } = "false";
         public string ForjaString { get; set; } = "false";
     }
-    
-    private async Task ManejarSeleccionDeArchivo(InputFileChangeEventArgs e)
-    {
-        var archivoImagen = e.File;
-
-        if (archivoImagen != null)
-        {
-            long maximoTamañoArchivo = 1024 * 1024 * 2; 
-            using var stream = archivoImagen.OpenReadStream(maximoTamañoArchivo);
-            var buffer = new byte[archivoImagen.Size];
-            await stream.ReadAsync(buffer, 0, (int)archivoImagen.Size);
-
-            string tipoContenido = archivoImagen.ContentType; // ej: "image/png"
-            string base64String = Convert.ToBase64String(buffer);
-
-            modelo.Foto = $"data:{tipoContenido};base64,{base64String}";
-        }
-    }
 }
+
+<style>
+    /* Contenedor místico */
+    .hogwarts-form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        background: radial-gradient(circle, #1a120b 0%, #0c0804 100%);
+        padding: 40px 20px;
+        font-family: 'Georgia', serif;
+    }
+
+    /* Tarjeta estilo pergamino */
+    .parchment-form-card {
+        background-color: #fbf5ef;
+        border: 2px solid #b39256;
+        outline: 12px double #3d2514;
+        outline-offset: -20px;
+        border-radius: 6px;
+        padding: 50px;
+        max-width: 750px;
+        width: 100%;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(139, 94, 26, 0.15);
+    }
+
+    .form-wizard-title {
+        font-family: 'Cinzel', 'Georgia', serif;
+        color: #3d2514;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .form-wizard-subtitle {
+        color: #705335;
+        font-style: italic;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .magic-divider {
+        border-top: 2px solid #b39256;
+        opacity: 0.4;
+        margin: 25px 0;
+    }
+
+    /* Sección Retrato / Subida */
+    .preview-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .avatar-frame {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 3px double #8c6d36;
+        padding: 4px;
+        background: #f4eae1;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .avatar-preview {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .file-drop-zone {
+        border: 2px dashed #b39256;
+        padding: 15px 25px;
+        text-align: center;
+        border-radius: 8px;
+        background: rgba(244, 234, 225, 0.6);
+        position: relative;
+        max-width: 320px;
+        transition: background 0.3s;
+    }
+
+    .file-drop-zone:hover {
+        background: rgba(230, 214, 198, 0.8);
+    }
+
+    .file-input-hidden {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-drop-text {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #4a3319;
+    }
+
+    /* Grillas y Formularios */
+    .magic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+
+    .form-group {
+        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .select-raza-container {
+        margin: 25px 0;
+        background: rgba(140, 109, 54, 0.06);
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 4px solid #8c6d36;
+    }
+
+    .magic-label {
+        font-weight: bold;
+        font-size: 0.95rem;
+        color: #3d2514;
+        margin-bottom: 6px;
+    }
+
+    .magic-label.highlight {
+        font-size: 1.1rem;
+        color: #8c6d36;
+    }
+
+    /* Inputs mágicos */
+    .magic-input {
+        background-color: #fcf9f5;
+        border: 1px solid #c2b094;
+        border-radius: 4px;
+        padding: 10px 14px;
+        font-family: 'Georgia', serif;
+        color: #2b1a0e;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .magic-input:focus {
+        outline: none;
+        border-color: #3d2514;
+        background-color: #fff;
+        box-shadow: 0 0 8px rgba(139, 94, 26, 0.3);
+    }
+
+    .magic-select {
+        cursor: pointer;
+    }
+
+    /* Secciones Dinámicas */
+    .dynamic-section-magic {
+        background: rgba(244, 234, 225, 0.5);
+        border: 1px double #b39256;
+        padding: 20px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+    .dynamic-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        color: #5c4033;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(139, 94, 26, 0.2);
+        padding-bottom: 5px;
+    }
+
+    /* Errores */
+    .text-danger-magic {
+        color: #a62b2b;
+        font-size: 0.85rem;
+        font-style: italic;
+        margin-top: 4px;
+    }
+
+    .magic-alert-error {
+        background-color: #f7e6e6;
+        border-left: 4px solid #a62b2b;
+        color: #5c1414;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    /* Botones de acción */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-magic-submit {
+        background: linear-gradient(135deg, #8c6d36 0%, #5c4033 100%);
+        color: #fbf5ef;
+        border: 1px solid #3d2514;
+        padding: 12px 28px;
+        font-size: 1.05rem;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-magic-submit:hover {
+        background: linear-gradient(135deg, #3d2514 0%, #1a120b 100%);
+        box-shadow: 0 0 15px rgba(140, 109, 54, 0.7);
+        transform: translateY(-1px);
+    }
+
+    .btn-magic-cancel {
+        background: #e6ded7;
+        color: #5c4033;
+        border: 1px solid #c2b094;
+        padding: 12px 24px;
+        font-size: 1.05rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-magic-cancel:hover {
+        background: #d4c8be;
+        color: #26140a;
+    }
+
+    /* Animación de entrada suave */
+    .animated-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

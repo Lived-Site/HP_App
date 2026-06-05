@@ -58,3 +58,52 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* --- Contenedor Global de Varita --- */
+#magic-sparks-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* Permite hacer clic en los botones de abajo */
+    z-index: 99999;       /* Por encima de cualquier interfaz */
+    overflow: hidden;
+}
+
+/* --- Estilo de la Chispa del Clic --- */
+.wand-click-spark {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.9), 0 0 25px 10px rgba(255, 223, 137, 0.7);
+    opacity: 1;
+    animation: wand-flash 0.6s ease-out forwards;
+}
+
+/* --- Partículas que vuelan --- */
+.wand-particle {
+    position: absolute;
+    background: #ffdf89; /* Dorado místico */
+    border-radius: 50%;
+    box-shadow: 0 0 5px #fff;
+    opacity: 1;
+    animation: particle-fade 0.8s ease-out forwards;
+}
+
+/* --- Animaciones CSS nativas --- */
+@keyframes wand-flash {
+    0% { transform: scale(0.2); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes particle-fade {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% {
+        transform: translate(var(--dest-x), var(--dest-y)) scale(0.1);
+        opacity: 0;
+    }
+}

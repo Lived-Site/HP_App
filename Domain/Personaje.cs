@@ -7,10 +7,10 @@ public abstract class Personaje
     public int IdPersonaje { get; private set; }
     public string Nombre { get; set; }
     public string Apellido { get; set; }
-    private DateTime fecha_nacimiento { get; set; }
-    private string Genero { get; set; }
-    private string TipoRaza { get; set; }
-    public string Foto { get; private set; }
+    public DateTime fecha_nacimiento { get; set; }
+    public string Genero { get; set; }
+    public string TipoRaza { get; set; }
+    public string Foto { get; set; }
 
     public Personaje(string Nombre, string Apellido, DateTime fecha_nacimiento, string Genero, string tipo_raza, string foto)
     {
@@ -72,6 +72,5 @@ public abstract class Personaje
     {
         TipoRaza = NuevaRaza;
     }
-    
     
 }

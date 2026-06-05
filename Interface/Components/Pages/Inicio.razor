@@ -2,21 +2,114 @@
 @using Service
 @rendermode InteractiveServer
 @inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
 
-<h3>Inicio</h3>
-<p>¿Que quieres hacer?</p>
+<PageTitle>Hogwarts - El Caldero Chorreante</PageTitle>
 
-<button class="btn btn-primary" @onclick="CrearPersonaje">Crear Personaje</button>
-<button class="btn btn-primary" @onclick="VerPersonajes">Ver Personajes</button>
+<div class="hogwarts-container">
+    <div class="parchment-card">
+        <div class="magic-header">
+            <div class="wand-spark"></div>
+            <h3 class="wizard-title">El Caldero Chorreante</h3>
+            <p class="wizard-subtitle">¿Qué camino deseas tomar el día de hoy, mago o bruja?</p>
+        </div>
+
+        <hr class="magic-divider" />
+
+        <div class="actions-container">
+            <button class="btn-magic btn-create" @onclick="CrearPersonaje">
+                <i class="wand-icon">✨</i> Forjar Nuevo Mago
+            </button>
+            <button class="btn-magic btn-view" @onclick="VerPersonajes">
+                <i class="book-icon">📜</i> Registro de Personajes
+            </button>
+        </div>
+    </div>
+</div>
 
 @code {
-    private void CrearPersonaje()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        NavManager.NavigateTo("/crearPersonaje");
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                if (window.magicAudio) {
+                    if (!window.magicAudio.src.includes('HPINICIO.mp3')) {
+                        window.magicAudio.pause();
+                        window.magicAudio = new Audio('audio/HPINICIO.mp3');
+                    }
+                } else {
+                    window.magicAudio = new Audio('audio/HPINICIO.mp3');
+                }
+                window.magicAudio.loop = true;
+                window.magicAudio.volume = 0.3;
+                window.magicAudio.play().catch(e => console.log('Audio bloqueado hasta interacción.'));
+            ");
+        }
     }
 
-    private void VerPersonajes()
-    {
-        NavManager.NavigateTo("/VerPersonajes");
-    }
+    private void CrearPersonaje() => NavManager.NavigateTo("/crearPersonaje");
+    private void VerPersonajes() => NavManager.NavigateTo("/VerPersonajes");
 }
+
+<style>
+    .hogwarts-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background: radial-gradient(circle, #1a120b 0%, #0c0804 100%);
+        padding: 20px;
+        font-family: 'Georgia', serif;
+    }
+
+    .parchment-card {
+        background-color: #f4eae1;
+        background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
+        background-size: 24px 24px;
+        border: 4px double #8c6d36;
+        border-radius: 8px;
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(139, 94, 26, 0.2);
+        position: relative;
+    }
+
+    .wizard-title {
+        font-family: 'Cinzel', 'Georgia', serif;
+        color: #3d2514;
+        font-weight: bold;
+        letter-spacing: 2px;
+        margin-bottom: 5px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .wizard-subtitle { color: #5c4033; font-style: italic; font-size: 1.1rem; }
+    .magic-divider { border-top: 2px solid #8c6d36; opacity: 0.5; margin: 25px 0; }
+    .actions-container { display: flex; flex-direction: column; gap: 15px; }
+
+    .btn-magic {
+        background: linear-gradient(135deg, #3d2514 0%, #26140a 100%);
+        color: #f4eae1;
+        border: 2px solid #8c6d36;
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .btn-magic:hover {
+        background: linear-gradient(135deg, #8c6d36 0%, #5c4033 100%);
+        color: #ffffff;
+        box-shadow: 0 0 15px rgba(140, 109, 54, 0.6);
+        transform: translateY(-2px);
+    }
+
+    .btn-magic:active { transform: translateY(1px); }
+    .btn-magic i { margin-right: 8px; }
+</style>

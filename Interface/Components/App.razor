@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8"/>
@@ -9,15 +9,58 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["Interface.styles.css"]"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
     <ImportMap/>
     <link rel="icon" type="image/png" href="favicon.png"/>
     <HeadOutlet/>
 </head>
 
 <body>
-<Routes/>
-<ReconnectModal/>
-<script src="@Assets["_framework/blazor.web.js"]"></script>
+    <div id="magic-sparks-container"></div>
+
+    <Routes/>
+    <ReconnectModal/>
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+
+    <script>
+        window.createWandSpark = function(e) {
+            const container = document.getElementById('magic-sparks-container');
+            if (!container) return;
+
+            // Chispa principal
+            const spark = document.createElement('div');
+            spark.className = 'wand-click-spark';
+            const size = 20; 
+            spark.style.left = (e.clientX - size/2) + 'px';
+            spark.style.top = (e.clientY - size/2) + 'px';
+            container.appendChild(spark);
+
+            // Partículas secundarias
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'wand-particle';
+                
+                const pSize = Math.random() * 6 + 2;
+                particle.style.width = pSize + 'px';
+                particle.style.height = pSize + 'px';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                
+                const destinationX = (Math.random() - 0.5) * 120; 
+                const destinationY = (Math.random() - 0.5) * 120; 
+                
+                particle.style.setProperty('--dest-x', destinationX + 'px');
+                particle.style.setProperty('--dest-y', destinationY + 'px');
+                
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+
+            setTimeout(() => spark.remove(), 600);
+        };
+
+        window.addEventListener('click', window.createWandSpark);
+    </script>
 </body>
 
 </html>

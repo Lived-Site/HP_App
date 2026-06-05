@@ -1,7 +1,9 @@
 ﻿namespace Service;
+
 using Domain;
-using Repositroy;
+using Repositroy; // Ojo aquí: verifica si no quisiste escribir 'Repository' en tu archivo original
 using Service.DTOs;
+
 public class PersonajeService
 {
     private readonly PersonajeRepository _personajeRepository;
@@ -11,7 +13,6 @@ public class PersonajeService
     {
         _casaRepository = new CasaRepository();
         _personajeRepository = new PersonajeRepository();
-        
     }
     
     public void CrearMago(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, string tipoSangre, int idCasa)
@@ -29,7 +30,6 @@ public class PersonajeService
         _personajeRepository.Agregar(nuevoMago);
     }
     
-    
     public void CrearMuggle(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, string Profesion, bool SabeDeMagia)
     {
         ValidarDatosBasicos(nombre, apellido, fechaNacimiento);
@@ -37,6 +37,7 @@ public class PersonajeService
         Muggle nuevoMuggle = new Muggle(nombre, apellido, fechaNacimiento, genero, "Muggle", foto, Profesion, SabeDeMagia);
         _personajeRepository.Agregar(nuevoMuggle);
     }
+
     public void CrearDuende(string nombre, string apellido, DateTime fechaNacimiento, string genero, string foto, bool trabaja, bool forja)
     {
         ValidarDatosBasicos(nombre, apellido, fechaNacimiento);
@@ -56,8 +57,8 @@ public class PersonajeService
         {
             throw new ArgumentException("La fecha de nacimiento no puede ser en el futuro.");
         }
-        
     }
+
     public IEnumerable<PersonajeDto> ObtenerTodosLosPersonajes()
     {
         IEnumerable<Personaje> personajesDominio = _personajeRepository.ObtenerTodos();
@@ -65,23 +66,27 @@ public class PersonajeService
 
         foreach (var p in personajesDominio)
         {
+            // CORRECCIÓN AQUÍ: Evitamos anteponer "images/" si la foto ya viene en formato Base64 de datos
+            string urlProcesada = (p.Foto != null && p.Foto.StartsWith("data:image")) 
+                ? p.Foto 
+                : $"images/{p.Foto ?? "silueta.png"}";
+
             var dto = new PersonajeDto
             {
                 Nombre = p.Nombre,
                 Apellido = p.Apellido,
-                FotoUrl = $"images/{p.Foto}"
+                FotoUrl = urlProcesada
             };
 
-            // Mapeo síncrono dependiendo del tipo de herencia del Dominio
-            if (p is Mago mago)
+            if (p is Mago)
             {
                 dto.Tipo = "Mago";
             }
-            else if (p is Muggle muggle)
+            else if (p is Muggle)
             {
                 dto.Tipo = "Muggle";
             }
-            else if (p is Duende duende)
+            else if (p is Duende)
             {
                 dto.Tipo = "Duende";
             }

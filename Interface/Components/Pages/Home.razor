@@ -1,22 +1,142 @@
 ﻿@page "/"
 @using Service
 @inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Hogwarts - Bienvenido</PageTitle>
 
-<h1>Harry Potter</h1>
+<div id="magic-sparks-container"></div>
 
-Welcome to your new world.
+<div class="hogwarts-entrance">
+    <div class="parchment-letter hidden-initially" id="main-parchment">
+        <div class="wax-seal">📜</div>
 
-<p role="status">Aprieta aqui para empezar</p>
-<button class="btn btn-primary" @onclick="Iniciar">Empezar</button>
+        <h1 class="hogwarts-title">Colegio Hogwarts de Magia y Hechicería</h1>
+        
+        <div class="letter-content">
+            <p class="salutation">Estimado mago o bruja,</p>
+            <p class="body-text">
+                Tenemos el placer de informarle de que dispone de una plaza en nuestro mundo. 
+                Aquí podrá forjar su propio legado, consultar el registro de personajes y desatar su potencial mágico.
+            </p>
+            <p class="instruction">Por favor, rompa el sello para abordar el Expreso de Hogwarts.</p>
+        </div>
+
+        <div class="button-container">
+            <button class="btn-magic-start" @onclick="Iniciar">
+                ✨ Atravesar el Andén 9 ¾
+            </button>
+        </div>
+    </div>
+</div>
 
 @code {
-
-    private void Iniciar()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-    NavManager.NavigateTo("/inicio");
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                window.playHomeAudio = function(e) {
+                    if (window.magicAudio) {
+                        if (!window.magicAudio.src.includes('HPHOME.mp3')) {
+                            window.magicAudio.pause();
+                            window.magicAudio = new Audio('audio/HPHOME.mp3');
+                        }
+                    } else {
+                        window.magicAudio = new Audio('audio/HPHOME.mp3');
+                    }
+                    window.magicAudio.loop = true;
+                    window.magicAudio.volume = 0.3;
+                    window.magicAudio.play().then(() => {
+                        document.getElementById('main-parchment').classList.add('revealed-parchment');
+                        document.removeEventListener('click', window.playHomeAudio);
+                    }).catch(e => {
+                        document.getElementById('main-parchment').classList.add('revealed-parchment');
+                    });
+                };
+
+                document.addEventListener('click', window.playHomeAudio);
+            ");
+        }
     }
 
+    private async Task Iniciar()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "document.removeEventListener('click', window.playHomeAudio);");
+        NavManager.NavigateTo("/inicio");
+    }
 }
+
+<style>
+    .hogwarts-entrance {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        background: radial-gradient(circle, #1a120b 0%, #0c0804 100%);
+        padding: 20px;
+        font-family: 'Georgia', serif;
+    }
+
+    .parchment-letter {
+        background-color: #fbf5ef;
+        border: 2px solid #b39256;
+        outline: 12px double #3d2514;
+        outline-offset: -20px;
+        border-radius: 4px;
+        padding: 50px 40px;
+        max-width: 550px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), inset 0 0 50px rgba(139, 94, 26, 0.15);
+        position: relative;
+        transition: opacity 1.5s ease-out, transform 1.2s ease-out, box-shadow 1s ease-in-out;
+    }
+
+    .hidden-initially {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+
+    .revealed-parchment {
+        opacity: 1 !important;
+        transform: scale(1) translateY(0px) !important;
+        box-shadow: 0 0 30px rgba(255, 223, 137, 0.4), 0 15px 35px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    #magic-sparks-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    .magic-spark {
+        position: absolute;
+        background: radial-gradient(circle, #fff 0%, #ffdf89 40%, rgba(255,223,137,0) 70%);
+        border-radius: 50%;
+        opacity: 1;
+        box-shadow: 0 0 10px #ffdf89, 0 0 5px #fff;
+        animation: spark-animation 1s ease-out forwards;
+    }
+
+    @@keyframes spark-animation {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--destination-x), var(--destination-y)) scale(0.1); }
+}
+
+    .wax-seal { font-size: 2.5rem; margin-bottom: 15px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
+    .hogwarts-title { font-family: 'Cinzel', 'Georgia', serif; color: #3d2514; font-size: 1.8rem; font-weight: bold; letter-spacing: 1px; margin-bottom: 30px; line-height: 1.3; }
+    .letter-content { color: #2b1a0e; text-align: left; line-height: 1.6; margin-bottom: 35px; }
+    .salutation { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; }
+    .body-text { font-style: italic; margin-bottom: 20px; }
+    .instruction { text-align: center; font-size: 0.95rem; font-weight: bold; color: #8c6d36; margin-top: 25px; }
+    .button-container { display: flex; justify-content: center; }
+    .btn-magic-start { background: linear-gradient(135deg, #8c6d36 0%, #5c4033 100%); color: #fbf5ef; border: 2px solid #3d2514; padding: 14px 30px; font-size: 1.15rem; font-weight: bold; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+    .btn-magic-start:hover { background: linear-gradient(135deg, #3d2514 0%, #1a120b 100%); color: #fff; box-shadow: 0 0 20px rgba(140, 109, 54, 0.8); transform: scale(1.03); }
+    .btn-magic-start:active { transform: scale(0.98); }
+</style>
