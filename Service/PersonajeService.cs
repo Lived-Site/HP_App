@@ -66,7 +66,6 @@ public class PersonajeService
 
         foreach (var p in personajesDominio)
         {
-            // CORRECCIÓN AQUÍ: Evitamos anteponer "images/" si la foto ya viene en formato Base64 de datos
             string urlProcesada = (p.Foto != null && p.Foto.StartsWith("data:image")) 
                 ? p.Foto 
                 : $"images/{p.Foto ?? "silueta.png"}";
@@ -78,9 +77,10 @@ public class PersonajeService
                 FotoUrl = urlProcesada
             };
 
-            if (p is Mago)
+            if (p is Mago magoEncontrado)
             {
                 dto.Tipo = "Mago";
+                dto.IdCasa = magoEncontrado.IdCasa;
             }
             else if (p is Muggle)
             {

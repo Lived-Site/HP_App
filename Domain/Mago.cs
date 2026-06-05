@@ -3,7 +3,7 @@
 public class Mago : Personaje
 {
     private string TipoSangre { get; set; }
-    private int IdCasa { get; set; }
+    public int IdCasa { get; set; }
     private List<Hechizo> HechizosConocidos { get; set; }
     private Varita varita { get; set; }
     private List<Mascota> Mascotas { get; set; }
