@@ -11,6 +11,8 @@ public abstract class Personaje
     public string Genero { get; set; }
     public string TipoRaza { get; set; }
     public string Foto { get; set; }
+    public bool PersonajeCreadoPorUsuario = true;
+
 
     public Personaje(string Nombre, string Apellido, DateTime fecha_nacimiento, string Genero, string tipo_raza, string foto)
     {

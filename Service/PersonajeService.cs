@@ -1,7 +1,7 @@
 ﻿namespace Service;
 
 using Domain;
-using Repositroy; // Ojo aquí: verifica si no quisiste escribir 'Repository' en tu archivo original
+using Repositroy;
 using Service.DTOs;
 
 public class PersonajeService
@@ -72,28 +72,71 @@ public class PersonajeService
 
             var dto = new PersonajeDto
             {
+                Id = p.IdPersonaje,
                 Nombre = p.Nombre,
                 Apellido = p.Apellido,
-                FotoUrl = urlProcesada
+                FotoUrl = urlProcesada,
+                PersonajeCreadoPorElUsuario = p.PersonajeCreadoPorUsuario 
             };
 
-            if (p is Mago magoEncontrado)
-            {
-                dto.Tipo = "Mago";
-                dto.IdCasa = magoEncontrado.IdCasa;
-            }
-            else if (p is Muggle)
-            {
-                dto.Tipo = "Muggle";
-            }
-            else if (p is Duende)
-            {
-                dto.Tipo = "Duende";
-            }
+            if (p is Mago magoEncontrado) { dto.Tipo = "Mago"; dto.IdCasa = magoEncontrado.IdCasa; }
+            else if (p is Muggle) { dto.Tipo = "Muggle"; }
+            else if (p is Duende) { dto.Tipo = "Duende"; }
 
             listaDtos.Add(dto);
         }
 
         return listaDtos;
+    }
+    
+    public PersonajeDto ObtenerPersonajePorId(int id)
+    {
+        var p = _personajeRepository.ObtenerPorId(id);
+        if (p == null) return null;
+
+        string urlProcesada = (p.Foto != null && p.Foto.StartsWith("data:image")) 
+            ? p.Foto 
+            : $"images/{p.Foto ?? "silueta.png"}";
+
+        return new PersonajeDto
+        {
+            Id = p.IdPersonaje,
+            Nombre = p.Nombre,
+            Apellido = p.Apellido,
+            Tipo = p.TipoRaza,
+            FotoUrl = urlProcesada,
+            IdCasa = p is Mago mago ? mago.IdCasa : 0,
+            PersonajeCreadoPorElUsuario = p.PersonajeCreadoPorUsuario
+        };
+    }
+    
+    public void ActualizarPersonaje(PersonajeDto dto)
+    {
+        var personaje = _personajeRepository.ObtenerPorId(dto.Id);
+        if (personaje == null) 
+            throw new InvalidOperationException("El habitante no existe en el censo.");
+
+        if (!personaje.PersonajeCreadoPorUsuario)
+            throw new InvalidOperationException("No tienes permisos del Ministerio para alterar a este habitante ancestral.");
+
+        personaje.CambiarNombre(dto.Nombre);
+        personaje.CambiarApellido(dto.Apellido);
+    
+        if (!string.IsNullOrEmpty(dto.FotoUrl))
+        {
+            if (dto.FotoUrl.StartsWith("images/"))
+            {
+                personaje.Foto = dto.FotoUrl.Replace("images/", "");
+            }
+            else
+            {
+                personaje.Foto = dto.FotoUrl;
+            }
+        }
+
+        if (personaje is Mago mago && dto.IdCasa != 0)
+        {
+            mago.IdCasa = dto.IdCasa; 
+        }
     }
 }

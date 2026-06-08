@@ -1,0 +1,438 @@
+﻿@page "/EditarPersonaje/{Id:int}"
+@using Service
+@using Service.DTOs
+@using System.IO
+@inject PersonajeService PersonajeService
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<PageTitle>Ministerio de Magia - Modificar Registro</PageTitle>
+
+<div class="hogwarts-form-container">
+    <div class="parchment-form-card">
+        
+        <div class="form-magic-header">
+            <h2 class="form-wizard-title">Modificar Registro Oficial</h2>
+            <p class="form-wizard-subtitle">Efectuando Hechizo de Transmutación sobre el pergamino del censo</p>
+        </div>
+
+        <hr class="magic-divider" />
+
+        @if (personajeDto == null)
+        {
+            <div class="magic-loading">
+                <p>🔮 <em>Buscando expediente en los archivos del Ministerio...</em></p>
+            </div>
+        }
+        else
+        {
+            <div class="preview-section">
+                <div class="avatar-frame">
+                    <img src="@(!string.IsNullOrEmpty(personajeDto.FotoUrl) && personajeDto.FotoUrl.StartsWith("data:image") ? personajeDto.FotoUrl : $"/images/{(string.IsNullOrEmpty(personajeDto.FotoUrl) ? "silueta.png" : personajeDto.FotoUrl)}")" 
+                         alt="Retrato Oficial" 
+                         class="avatar-preview" />
+                </div>
+                
+                <div class="file-drop-zone">
+                    <InputFile OnChange="ManejarSeleccionDeArchivo" accept=".png,.jpg,.jpeg" class="file-input-hidden" />
+                    <p class="file-drop-text">
+                        📷 Haz clic o <strong>arrastra una foto nueva</strong> para transmutar el retrato.
+                    </p>
+                </div>
+            </div>
+
+            <div class="magic-grid">
+                <div class="form-group">
+                    <label class="magic-label">Nombre:</label>
+                    <input type="text" @bind="personajeDto.Nombre" class="magic-input" />
+                </div>
+
+                <div class="form-group">
+                    <label class="magic-label">Apellido:</label>
+                    <input type="text" @bind="personajeDto.Apellido" class="magic-input" />
+                </div>
+            </div>
+
+            <div class="form-group select-raza-container">
+                <label class="magic-label highlight">Naturaleza / Tipo de Raza:</label>
+                <input type="text" value="@personajeDto.Tipo" class="magic-input" disabled style="cursor: not-allowed; opacity: 0.7;" />
+                <small class="text-muted-magic">🔒 Las leyes del Ministerio impiden alterar la naturaleza original del ser.</small>
+            </div>
+
+            @if (personajeDto.Tipo == "Mago")
+            {
+                <div class="dynamic-section-magic animated-fade-in">
+                    <h4 class="dynamic-title">Datos del Colegio y Linaje</h4>
+                    <div class="magic-grid">
+                        <div class="form-group">
+                            <label class="magic-label">Casa de Hogwarts:</label>
+                            <select @bind="personajeDto.IdCasa" class="magic-input magic-select">
+                                <option value="1">Gryffindor 🦁</option>
+                                <option value="2">Slytherin 🐍</option>
+                                <option value="3">Hufflepuff 🦡</option>
+                                <option value="4">Ravenclaw 🦅</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(mensajeError))
+            {
+                <div class="magic-alert-error">
+                    🔮 <strong>Error del Ministerio:</strong> @mensajeError
+                </div>
+            }
+
+            <div class="form-actions">
+                <button type="button" class="btn-magic-cancel" @onclick="Cancelar">
+                    ❌ Cancelar
+                </button>
+                <button type="button" class="btn-magic-submit" @onclick="Guardar">
+                    ✨ Aplicar Cambios
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private PersonajeDto? personajeDto;
+    private string mensajeError = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        personajeDto = PersonajeService.ObtenerPersonajePorId(Id);
+        if (personajeDto == null)
+        {
+            NavManager.NavigateTo("/VerPersonajes");
+        }
+    }
+
+    private async Task ManejarSeleccionDeArchivo(InputFileChangeEventArgs e)
+    {
+        var archivoImagen = e.File;
+        if (archivoImagen != null)
+        {
+            try
+            {
+                mensajeError = string.Empty;
+                long maximoTamañoArchivo = 1024 * 1024 * 2; // Limitado a 2MB
+                using var stream = archivoImagen.OpenReadStream(maximoTamañoArchivo);
+            
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+
+                var buffer = memoryStream.ToArray();
+                string tipoContenido = archivoImagen.ContentType;
+                string base64String = Convert.ToBase64String(buffer);
+
+                personajeDto!.FotoUrl = $"data:{tipoContenido};base64,{base64String}";
+            }
+            catch (IOException ex)
+            {
+                mensajeError = "El pergamino de la imagen supera el límite de 2MB permitido.";
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                mensajeError = "Error al procesar el retrato oficial.";
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+    }
+
+    private void Guardar()
+    {
+        try
+        {
+            if (personajeDto == null) return;
+            
+            mensajeError = string.Empty;
+            
+            if (string.IsNullOrWhiteSpace(personajeDto.Nombre) || string.IsNullOrWhiteSpace(personajeDto.Apellido))
+            {
+                mensajeError = "Los nombres y apellidos no pueden quedar vacíos en el registro oficial.";
+                return;
+            }
+
+            PersonajeService.ActualizarPersonaje(personajeDto);
+            NavManager.NavigateTo("/VerPersonajes");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private void Cancelar() => NavManager.NavigateTo("/VerPersonajes");
+}
+
+<style>
+    /* Contenedor místico */
+    .hogwarts-form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: radial-gradient(circle, #1a120b 0%, #0c0804 100%);
+        padding: 40px 20px;
+        font-family: 'Georgia', serif;
+    }
+
+    /* Tarjeta estilo pergamino */
+    .parchment-form-card {
+        background-color: #fbf5ef;
+        border: 2px solid #b39256;
+        outline: 12px double #3d2514;
+        outline-offset: -20px;
+        border-radius: 6px;
+        padding: 50px;
+        max-width: 750px;
+        width: 100%;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(139, 94, 26, 0.15);
+    }
+
+    .form-magic-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-wizard-title {
+        font-family: 'Cinzel', 'Georgia', serif;
+        color: #3d2514;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        font-size: 2.2rem;
+    }
+
+    .form-wizard-subtitle {
+        color: #705335;
+        font-style: italic;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .magic-divider {
+        border-top: 2px solid #b39256;
+        opacity: 0.4;
+        margin: 25px 0;
+    }
+
+    /* Sección Retrato / Subida */
+    .preview-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .avatar-frame {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 3px double #8c6d36;
+        padding: 4px;
+        background: #f4eae1;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .avatar-preview {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .file-drop-zone {
+        border: 2px dashed #b39256;
+        padding: 15px 25px;
+        text-align: center;
+        border-radius: 8px;
+        background: rgba(244, 234, 225, 0.6);
+        position: relative;
+        max-width: 320px;
+        transition: background 0.3s;
+    }
+
+    .file-drop-zone:hover {
+        background: rgba(230, 214, 198, 0.8);
+    }
+
+    .file-input-hidden {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-drop-text {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #4a3319;
+    }
+
+    /* Grillas y Formularios */
+    .magic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .select-raza-container {
+        margin: 25px 0;
+        background: rgba(140, 109, 54, 0.06);
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 4px solid #8c6d36;
+    }
+
+    .magic-label {
+        font-weight: bold;
+        font-size: 0.95rem;
+        color: #3d2514;
+        margin-bottom: 6px;
+    }
+
+    .magic-label.highlight {
+        font-size: 1.1rem;
+        color: #8c6d36;
+    }
+
+    /* Inputs mágicos */
+    .magic-input {
+        background-color: #fcf9f5;
+        border: 1px solid #c2b094;
+        border-radius: 4px;
+        padding: 10px 14px;
+        font-family: 'Georgia', serif;
+        color: #2b1a0e;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .magic-input:focus {
+        outline: none;
+        border-color: #3d2514;
+        background-color: #fff;
+        box-shadow: 0 0 8px rgba(139, 94, 26, 0.3);
+    }
+
+    .magic-select {
+        cursor: pointer;
+    }
+
+    /* Secciones Dinámicas */
+    .dynamic-section-magic {
+        background: rgba(244, 234, 225, 0.5);
+        border: 1px double #b39256;
+        padding: 20px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+    .dynamic-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        color: #5c4033;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(139, 94, 26, 0.2);
+        padding-bottom: 5px;
+    }
+
+    .text-muted-magic {
+        font-size: 0.8rem;
+        color: #705335;
+        font-style: italic;
+        margin-top: 5px;
+    }
+
+    /* Mensajes de Alerta Estilo Ministerio */
+    .magic-alert-error {
+        background-color: #f7e6e6;
+        border-left: 4px solid #a62b2b;
+        color: #5c1414;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .magic-loading {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6b532c;
+        font-style: italic;
+    }
+
+    /* Botones de acción */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-magic-submit {
+        background: linear-gradient(135deg, #8c6d36 0%, #5c4033 100%);
+        color: #fbf5ef;
+        border: 1px solid #3d2514;
+        padding: 12px 28px;
+        font-size: 1.05rem;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-magic-submit:hover {
+        background: linear-gradient(135deg, #3d2514 0%, #1a120b 100%);
+        box-shadow: 0 0 15px rgba(140, 109, 54, 0.7);
+        transform: translateY(-1px);
+    }
+
+    .btn-magic-cancel {
+        background: #e6ded7;
+        color: #5c4033;
+        border: 1px solid #c2b094;
+        padding: 12px 24px;
+        font-size: 1.05rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-magic-cancel:hover {
+        background: #d4c8be;
+        color: #26140a;
+    }
+
+    .animated-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    /* Doble @@ para evitar el color rojo en el compilador de Blazor */
+    @@media (max-width: 600px) {
+        .magic-grid { grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

@@ -52,8 +52,7 @@ public class PersonajeRepository : RepositoryBase<Personaje>
         
         // Ravenclaw (ID: 4)
         Mago luna = new Mago("Luna", "Lovegood", new DateTime(1981, 2, 13), "Mujer", "Mago", "luna.png", "Pura", 4);
-        Mago cho = new Mago("Cho", "Chang", new DateTime(1979, 9, 1), "Mujer", "Mago", "Pura", "cho.png", 4); 
-        Mago Lockhart = new Mago("Gilderoy", "Lockhart", new DateTime(1964, 1, 26), "Hombre", "Mago", "lock.webp", "Mestiza", 4);
+        Mago cho = new Mago("Cho", "Chang", new DateTime(1979, 9, 1), "Mujer", "Mago", "cho.png", "Pura", 4);        Mago Lockhart = new Mago("Gilderoy", "Lockhart", new DateTime(1964, 1, 26), "Hombre", "Mago", "lock.webp", "Mestiza", 4);
         Mago ollivander = new Mago("Garrick", "Ollivander", new DateTime(1919, 9, 25), "Hombre", "Mago", "garrick.webp", "Mestiza", 4);
         
         Agregar(harry);
@@ -86,7 +85,41 @@ public class PersonajeRepository : RepositoryBase<Personaje>
         Agregar(newt);
         Agregar(Lockhart);
         Agregar(ollivander);
+        
+        harry.PersonajeCreadoPorUsuario = false;
+        hermione.PersonajeCreadoPorUsuario = false;
+        ron.PersonajeCreadoPorUsuario = false;
+        tom.PersonajeCreadoPorUsuario = false;
+        snape.PersonajeCreadoPorUsuario = false;
+        dumbledore.PersonajeCreadoPorUsuario = false;
+        draco.PersonajeCreadoPorUsuario = false;
+        neville.PersonajeCreadoPorUsuario = false;
+        luna.PersonajeCreadoPorUsuario = false;
+        mcgonagall.PersonajeCreadoPorUsuario = false;
+        sirius.PersonajeCreadoPorUsuario = false;
+        lupin.PersonajeCreadoPorUsuario = false;
+        ginny.PersonajeCreadoPorUsuario = false;
+        fred.PersonajeCreadoPorUsuario = false;
+        george.PersonajeCreadoPorUsuario = false;
+        cedric.PersonajeCreadoPorUsuario = false;
+        cho.PersonajeCreadoPorUsuario = false;
+        bellatrix.PersonajeCreadoPorUsuario = false;
+        mollyWeasley.PersonajeCreadoPorUsuario = false;
+        arthurWeasley.PersonajeCreadoPorUsuario = false;
+        seamus.PersonajeCreadoPorUsuario = false;
+        dean.PersonajeCreadoPorUsuario = false;
+        lucius.PersonajeCreadoPorUsuario = false;
+        narcissa.PersonajeCreadoPorUsuario = false;
+        regulus.PersonajeCreadoPorUsuario = false;
+        pansy.PersonajeCreadoPorUsuario = false;
+        tonks.PersonajeCreadoPorUsuario = false;
+        newt.PersonajeCreadoPorUsuario = false;
+        Lockhart.PersonajeCreadoPorUsuario = false;
+        ollivander.PersonajeCreadoPorUsuario = false;
+        
     }
+    
+    
     public override Personaje? ObtenerPorId(int id)
     {
         return _elementos.FirstOrDefault(p => p.IdPersonaje == id);

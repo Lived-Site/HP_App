@@ -81,29 +81,41 @@
                 @foreach (var personaje in PersonajesFiltrados)
                 {
                     <div class="character-card">
-                        <div class="card-avatar-zone">
-                            <div class="avatar-ring">
-                                <img src="@personaje.FotoUrl" 
-                                     alt="Foto de @personaje.Nombre" 
-                                     @onclick="() => MostrarFotoGrande(personaje.FotoUrl)"
-                                     class="character-avatar-img" />
+            
+                        <div class="card-main-content">
+                            <div class="card-avatar-zone">
+                                <div class="avatar-ring">
+                                    <img src="@personaje.FotoUrl" 
+                                         alt="Foto de @personaje.Nombre" 
+                                         @onclick="() => MostrarFotoGrande(personaje.FotoUrl)"
+                                         class="character-avatar-img" />
+                                </div>
+                            </div>
+                
+                            <div class="card-info-zone">
+                                <h3 class="character-name">@personaje.Nombre @personaje.Apellido</h3>
+                    
+                                <span class="badge-raza @personaje.Tipo.ToLower()">
+                                    @switch (personaje.Tipo)
+                                    {
+                                        case "Mago": <span>🪄 Mago / Bruja</span> break;
+                                        case "Muggle": <span>👤 Muggle</span> break;
+                                        case "Duende": <span>🪙 Duende</span> break;
+                                        default: <span>🔮 Desconocido</span> break;
+                                    }
+                                </span>
                             </div>
                         </div>
-                        
-                        <div class="card-info-zone">
-                            <h3 class="character-name">@personaje.Nombre @personaje.Apellido</h3>
-                            
-                            <!-- Badge Dinámico según la raza -->
-                            <span class="badge-raza @personaje.Tipo.ToLower()">
-                                @switch (personaje.Tipo)
-                                {
-                                    case "Mago": <span>🪄 Mago / Bruja</span> break;
-                                    case "Muggle": <span>👤 Muggle</span> break;
-                                    case "Duende": <span>🪙 Duende</span> break;
-                                    default: <span>🔮 Desconocido</span> break;
-                                }
-                            </span>
-                        </div>
+
+                        @if (personaje.PersonajeCreadoPorElUsuario)
+                        {
+                            <div class="card-action-zone">
+                                <button @onclick="() => EditarPersonaje(personaje.Id)" class="btn-magic-edit">
+                                    🪄 Editar
+                                </button>
+                            </div>
+                        }
+            
                     </div>
                 }
             </div>
@@ -169,7 +181,7 @@
         font-size: 1rem;
     }
 
-    /* NUEVOS ESTILOS DEL PANEL DE FILTROS */
+    /* PANEL DE FILTROS */
     .magic-filters-panel {
         background: rgba(74, 54, 24, 0.08);
         border: 1px dashed #8a6d3b;
@@ -217,8 +229,6 @@
         box-shadow: 0 0 5px rgba(116, 27, 18, 0.2);
     }
 
-    /* Fin estilos nuevos de filtros */
-
     .magic-divider {
         border: 0;
         height: 2px;
@@ -249,9 +259,10 @@
         background: linear-gradient(135deg, #8a251a 0%, #5a1b0b 100%);
     }
 
+    /* GRILLA Y TARJETAS MODIFICADAS */
     .characters-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
         margin-top: 1rem;
     }
@@ -263,15 +274,24 @@
         padding: 1.2rem;
         display: flex;
         align-items: center;
+        justify-content: space-between; /* Empuja el botón al extremo derecho */
         gap: 1rem;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         transition: transform 0.2s, box-shadow 0.2s;
+        min-height: 115px; /* Asegura simetría visual en todas las tarjetas */
     }
     .character-card:hover {
-        transform: scale(1.03);
+        transform: scale(1.02);
         box-shadow: 0 8px 15px rgba(74, 54, 24, 0.15);
         background: rgba(255, 252, 242, 0.9);
         border-color: #8a6d3b;
+    }
+
+    .card-main-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-grow: 1; /* Absorbe el espacio disponible sin apretar los componentes */
     }
 
     .avatar-ring {
@@ -281,6 +301,7 @@
         padding: 3px;
         background: linear-gradient(135deg, #8a6d3b, #4a3618);
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        flex-shrink: 0; /* Evita que el anillo del avatar se deforme */
     }
     .character-avatar-img {
         width: 100%;
@@ -298,18 +319,22 @@
     .card-info-zone {
         display: flex;
         flex-direction: column;
-        gap: 0.3rem;
+        gap: 0.4rem;
+        justify-content: center;
     }
     .character-name {
         margin: 0;
         font-size: 1.15rem;
         color: #2b1f10;
         font-weight: bold;
+        line-height: 1.2;
     }
 
     .badge-raza {
-        display: inline-block;
-        padding: 0.2rem 0.6rem;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap; /* Impide de forma absoluta el colapso vertical */
+        padding: 0.3rem 0.6rem;
         font-size: 0.75rem;
         font-weight: bold;
         border-radius: 4px;
@@ -322,6 +347,33 @@
     .badge-raza.muggle { background-color: #e2e8f0; color: #334155; border-color: #cbd5e1; }
     .badge-raza.duende { background-color: #fef3c7; color: #78350f; border-color: #fcd34d; }
 
+    /* BOTÓN EDITAR ESTILIZADO */
+    .card-action-zone {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .btn-magic-edit {
+        background: linear-gradient(135deg, #5a1b0b 0%, #4a1506 100%);
+        color: #f4ecd8;
+        border: 1px solid #8a6d3b;
+        padding: 0.5rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .btn-magic-edit:hover {
+        background: linear-gradient(135deg, #741b12 0%, #5a1b0b 100%);
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(116, 27, 18, 0.3);
+    }
+
+    /* ELEMENTOS AUXILIARES Y MODAL */
     .magic-loading, .magic-empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -421,4 +473,10 @@
     private void MostrarFotoGrande(string url) => fotoGrandeUrl = url;
     private void CerrarFotoGrande() => fotoGrandeUrl = string.Empty;
     private void IrACrear() => NavManager.NavigateTo("/crearPersonaje");
+
+    private void EditarPersonaje(int id)
+    {
+        NavManager.NavigateTo($"/EditarPersonaje/{id}");
+    }
+
 }
