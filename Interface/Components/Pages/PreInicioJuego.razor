@@ -1,0 +1,17 @@
+﻿@page "/PreInicioJuego"
+@rendermode InteractiveServer
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+<h3>PreInicioJuego</h3>
+<br/>
+<h4>Elige un modo de juego</h4>
+<button class="btn-magic btn-view" @onclick="JugarCuestionario">
+    <i class="play-icon">❓</i> Cuestionario
+</button>
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender){}
+
+    private void JugarCuestionario() => NavManager.NavigateTo("/Cuestionario");
+
+}

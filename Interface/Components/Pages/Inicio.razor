@@ -20,6 +20,9 @@
             <button class="btn-magic btn-create" @onclick="CrearPersonaje">
                 <i class="wand-icon">✨</i> Forjar Nuevo Mago
             </button>
+            <button class="btn-magic btn-view" @onclick="Jugar">
+                <i class="play-icon">🎮</i> Jugar
+            </button>
             <button class="btn-magic btn-view" @onclick="VerPersonajes">
                 <i class="book-icon">📜</i> Registro de Personajes
             </button>
@@ -50,6 +53,7 @@
 
     private void CrearPersonaje() => NavManager.NavigateTo("/crearPersonaje");
     private void VerPersonajes() => NavManager.NavigateTo("/VerPersonajes");
+    private void Jugar() => NavManager.NavigateTo("/PreInicioJuego");
 }
 
 <style>
