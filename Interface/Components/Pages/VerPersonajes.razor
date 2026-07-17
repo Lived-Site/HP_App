@@ -137,6 +137,52 @@
     </div>
 }
 
+
+
+@code {
+    private IEnumerable<PersonajeDto> personajes;
+    private string fotoGrandeUrl = string.Empty;
+
+    // Variables de estado para enlazar los filtros
+    private string busquedaTexto = string.Empty;
+    private string filtroTipo = "Todos";
+    private int filtroCasa = 0;
+
+    protected override void OnInitialized()
+    {
+        personajes = PersonajeService.ObtenerTodosLosPersonajes();
+    }
+    private IEnumerable<PersonajeDto> PersonajesFiltrados
+    {
+        get
+        {
+            if (personajes == null) return Enumerable.Empty<PersonajeDto>();
+
+            return personajes.Where(p =>
+                (filtroTipo == "Todos" || p.Tipo.Equals(filtroTipo, StringComparison.OrdinalIgnoreCase)) &&
+                
+                (string.IsNullOrWhiteSpace(busquedaTexto) || 
+                 p.Nombre.Contains(busquedaTexto, StringComparison.OrdinalIgnoreCase) || 
+                 p.Apellido.Contains(busquedaTexto, StringComparison.OrdinalIgnoreCase)) &&
+                
+                (filtroCasa == 0 || p.IdCasa == filtroCasa)
+            );
+        }
+    }
+
+    private void MostrarFotoGrande(string url) => fotoGrandeUrl = url;
+    private void CerrarFotoGrande() => fotoGrandeUrl = string.Empty;
+    private void IrACrear() => NavManager.NavigateTo("/crearPersonaje");
+
+    private void EditarPersonaje(int id)
+    {
+        NavManager.NavigateTo($"/EditarPersonaje/{id}");
+    }
+
+}
+
+
+
 <style>
     .hogwarts-list-container {
         display: flex;
@@ -439,44 +485,3 @@
     @@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 
-@code {
-    private IEnumerable<PersonajeDto> personajes;
-    private string fotoGrandeUrl = string.Empty;
-
-    // Variables de estado para enlazar los filtros
-    private string busquedaTexto = string.Empty;
-    private string filtroTipo = "Todos";
-    private int filtroCasa = 0;
-
-    protected override void OnInitialized()
-    {
-        personajes = PersonajeService.ObtenerTodosLosPersonajes();
-    }
-    private IEnumerable<PersonajeDto> PersonajesFiltrados
-    {
-        get
-        {
-            if (personajes == null) return Enumerable.Empty<PersonajeDto>();
-
-            return personajes.Where(p =>
-                (filtroTipo == "Todos" || p.Tipo.Equals(filtroTipo, StringComparison.OrdinalIgnoreCase)) &&
-                
-                (string.IsNullOrWhiteSpace(busquedaTexto) || 
-                 p.Nombre.Contains(busquedaTexto, StringComparison.OrdinalIgnoreCase) || 
-                 p.Apellido.Contains(busquedaTexto, StringComparison.OrdinalIgnoreCase)) &&
-                
-                (filtroCasa == 0 || p.IdCasa == filtroCasa)
-            );
-        }
-    }
-
-    private void MostrarFotoGrande(string url) => fotoGrandeUrl = url;
-    private void CerrarFotoGrande() => fotoGrandeUrl = string.Empty;
-    private void IrACrear() => NavManager.NavigateTo("/crearPersonaje");
-
-    private void EditarPersonaje(int id)
-    {
-        NavManager.NavigateTo($"/EditarPersonaje/{id}");
-    }
-
-}
