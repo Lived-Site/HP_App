@@ -13,21 +13,21 @@ public class Pregunta
     {
         this.IdPregunta = UltimoId;
         UltimoId++;
-        if (string.IsNullOrWhiteSpace(Letra)) 
+        if (string.IsNullOrWhiteSpace(letra)) 
             throw new ArgumentException("Debe ingresar una letra");
-        if (string.IsNullOrWhiteSpace(RespuestaCorrecta))
+        if (string.IsNullOrWhiteSpace(respuestaCorrecta))
             throw new ArgumentException("Debe ingresar una respuesta correcta");
-        if(Respuestas.Count < 2)
+        if(Respuestas != null && Respuestas.Count < 2)
             throw new ArgumentException("Debe ingresar al menos 2 respuesta");
         if (dificultad < 1)
             throw new ArgumentException("La dificultad debe ser mayor que 0");
         if (!respuestas.Contains(respuestaCorrecta))
             throw new ArgumentException("La respuesta correcta debe estar entre las opciones.");
         
-        this.Letra = Letra;
-        this.Dificultad = Dificultad;
+        this.Letra = letra;
+        this.Dificultad = dificultad;
         this.Respuestas = respuestas;
-        this.RespuestaCorrecta = RespuestaCorrecta;
+        this.RespuestaCorrecta = respuestaCorrecta;
     }
 
     public void ModificarPregunta(string nuevaPregunta)
